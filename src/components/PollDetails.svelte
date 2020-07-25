@@ -1,18 +1,28 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import PollStores from "./stores/PollStores.js"
   import Card from "./shared/Card.svelte";
-  export let poll;
 
-  let dispatch = createEventDispatcher()
-
+  export let poll
+  
   $: totalVotes = poll.votesA + poll.votesB;
   $: percentA = Math.floor(100 / totalVotes * poll.votesA)
   $: percentB = Math.floor(100 / totalVotes * poll.votesB)
 
   const handleVote = (options, id) => {
-    dispatch("vote", {options, id})
-  }
+    PollStores.update(polls => {
+      let copyPoll = [...polls]
+      let upvotedPoll = polls.find((poll) => poll.id == id)
 
+      if(options == "a") {
+        upvotedPoll.votesA++;
+      }
+      if(options == "b") {
+        upvotedPoll.votesB++;
+      }
+
+      return copyPoll;
+    })
+  }
 </script>
 
 <Card>
@@ -55,18 +65,17 @@
     padding: 10px 20px;
     color: black;
   }
-
   .percent {
     height: 100%;
     position: absolute;
     box-sizing: border-box;
   }
-
   .percent-a {
     background: rgba(97,218,251, 0.8);
+    border-left: 5px solid rgba(97,218,251, 0.8);
   }
-
   .percent-b {
     background: rgba(255,62,0, 0.8);
+    border-left: 5px solid rgba(255,62,0, 0.8);
   }
 </style>
